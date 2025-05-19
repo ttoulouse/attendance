@@ -1,0 +1,105 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Course;         // Make sure you have this model
+use App\Models\ClassStudent;   // Model for the class_students table
+use Illuminate\Http\Request;
+
+class StudentController extends Controller
+{
+    /**
+     * Show all active courses (like the dashboard).
+     */
+    public function index()
+    {
+        // Active = start_date <= today && end_date >= today
+        $courses = Course::whereDate('start_date', '<=', now())
+                         ->whereDate('end_date', '>=', now())
+                         ->get();
+
+        return view('students.index', compact('courses'));
+    }
+
+    /**
+     * Show the students in a specific course + form to add new students.
+     */
+public function showForCourse(\App\Models\Course $course)
+{
+    // Retrieve students using the relationship defined in your Course model
+    $students = $course->classStudents;
+    return view('students.show', compact('course', 'students'));
+}
+
+    /**
+     * Store newly pasted students for the specified course.
+     */
+    public function store(Request $request, Course $course)
+    {
+        // "student_names" is the textarea input
+        $lines = explode("\n", $request->input('student_names', ''));
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if (!$line) {
+                continue; // skip empty lines
+            }
+
+            // Attempt to split on the first space
+            $parts = explode(' ', $line, 2);
+            if (count($parts) < 2) {
+                // Not in "LastName FirstName" format, skip or handle differently
+                continue;
+            }
+            $lastName = $parts[0];
+            $firstName = $parts[1];
+
+            // Create a new record in class_students
+            ClassStudent::create([
+                'class_id'   => $course->id,
+                'first_name' => $firstName,
+                'last_name'  => $lastName,
+            ]);
+        }
+
+        return redirect()->route('students.showForCourse', $course->id)
+                         ->with('status', 'Students added successfully!');
+    }
+
+  public function edit(Course $course, ClassStudent $student)
+    {
+        // Optional: verify $student->class_id == $course->id to ensure correct association
+        return view('students.edit', compact('course', 'student'));
+    }
+
+    /**
+     * Update the student's name in the class_students table.
+     */
+    public function update(Request $request, Course $course, ClassStudent $student)
+    {
+        // Optional: verify $student->class_id == $course->id
+        $request->validate([
+            'first_name' => 'required|string|max:100',
+            'last_name'  => 'required|string|max:100',
+        ]);
+
+        $student->update([
+            'first_name' => $request->input('first_name'),
+            'last_name'  => $request->input('last_name'),
+        ]);
+
+        return redirect()->route('students.showForCourse', $course->id)
+                         ->with('status', 'Student updated successfully!');
+    }
+
+    /**
+     * Remove a student from the course.
+     */
+    public function destroy(Course $course, ClassStudent $student)
+    {
+        // Optional: verify $student->class_id == $course->id
+        $student->delete();
+
+        return redirect()->route('students.showForCourse', $course->id)
+                         ->with('status', 'Student deleted successfully!');
+    }
+}

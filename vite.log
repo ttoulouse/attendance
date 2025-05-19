@@ -1,0 +1,14 @@
+nohup: ignoring input
+
+> dev
+> vite
+
+
+  VITE v6.2.2  ready in 575 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+
+  LARAVEL v12.2.0  plugin v1.2.0
+
+  ➜  APP_URL: http://localhost
