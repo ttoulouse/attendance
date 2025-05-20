@@ -120,7 +120,7 @@ public function alertsIndex()
     return view('attendance.alerts_index', compact('courses'));
 }
 
-public function alertsForCourse(\App\Models\Course $course)
+    public function alertsForCourse(\App\Models\Course $course)
 {
     // Total sessions scheduled for this course
     $totalSessions = $course->attendanceSessions()->count();
@@ -174,5 +174,45 @@ public function alertsForCourse(\App\Models\Course $course)
 
     return view('attendance.alerts_course', compact('course', 'alerts'));
 }
+
+    /**
+     * Show attendance reports index page listing active courses.
+     */
+    public function reportIndex()
+    {
+        $courses = Course::whereDate('start_date', '<=', now())
+            ->whereDate('end_date', '>=', now())
+            ->get();
+
+        return view('attendance.report_index', compact('courses'));
+    }
+
+    /**
+     * Display per-student attendance counts for the given course.
+     */
+    public function reportForCourse(Course $course)
+    {
+        $totalSessions = $course->attendanceSessions()->count();
+
+        $report = collect();
+
+        foreach ($course->classStudents as $student) {
+            $attended = $student->attendanceRecords()
+                ->whereHas('attendanceSession', function ($query) use ($course) {
+                    $query->where('class_id', $course->id);
+                })
+                ->count();
+
+            $missed = $totalSessions - $attended;
+
+            $report->push([
+                'student' => $student,
+                'attended' => $attended,
+                'missed' => $missed,
+            ]);
+        }
+
+        return view('attendance.report_course', compact('course', 'report'));
+    }
 
 }
