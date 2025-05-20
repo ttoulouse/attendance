@@ -77,6 +77,13 @@ Route::get('/attendance-alerts', [AttendanceController::class, 'alertsIndex'])
 Route::get('/attendance-alerts/{course}', [AttendanceController::class, 'alertsForCourse'])
     ->name('attendance.alerts.course');
 
+// Attendance reports show counts for all students in a course.
+Route::get('/attendance-report', [AttendanceController::class, 'reportIndex'])
+    ->name('attendance.report.index');
+
+Route::get('/attendance-report/{course}', [AttendanceController::class, 'reportForCourse'])
+    ->name('attendance.report.course');
+
 
 Route::get('/course/{course}/students', [StudentController::class, 'showForCourse'])
     ->name('students.showForCourse');
