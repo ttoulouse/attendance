@@ -88,6 +88,14 @@ Route::get('/attendance-report', [AttendanceController::class, 'reportIndex'])
 Route::get('/attendance-report/{course}', [AttendanceController::class, 'reportForCourse'])
     ->name('attendance.report.course');
 
+// Attendance session management routes
+Route::get('/attendance-sessions', [AttendanceController::class, 'sessionsIndex'])
+    ->name('attendance.sessions.index');
+Route::get('/attendance-sessions/{course}', [AttendanceController::class, 'sessionsForCourse'])
+    ->name('attendance.sessions.course');
+Route::post('/attendance-sessions/{course}/{session}/archive', [AttendanceController::class, 'archiveSession'])
+    ->name('attendance.sessions.archive');
+
 
 Route::get('/course/{course}/students', [StudentController::class, 'showForCourse'])
     ->name('students.showForCourse');
