@@ -53,6 +53,9 @@
         <a href="{{ route('attendance.report.index') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
             Attendance Report
         </a>
+        <a href="{{ route('attendance.sessions.index') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+            Session Management
+        </a>
     </div>
 </div>
 

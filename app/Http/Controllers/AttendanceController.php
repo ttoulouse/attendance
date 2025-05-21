@@ -199,6 +199,40 @@ public function alertsIndex()
     }
 
     /**
+     * Show the session management index listing active courses.
+     */
+    public function sessionsIndex()
+    {
+        $courses = Course::whereDate('start_date', '<=', now())
+            ->whereDate('end_date', '>=', now())
+            ->get();
+
+        return view('attendance.sessions_index', compact('courses'));
+    }
+
+    /**
+     * Display sessions for the given course.
+     */
+    public function sessionsForCourse(Course $course)
+    {
+        $sessions = $course->attendanceSessions()
+            ->orderBy('session_date', 'desc')
+            ->get();
+
+        return view('attendance.sessions_course', compact('course', 'sessions'));
+    }
+
+    /**
+     * Soft delete an attendance session.
+     */
+    public function archiveSession(Course $course, AttendanceSession $session)
+    {
+        $session->delete();
+
+        return redirect()->back()->with('status', 'Session archived');
+    }
+
+    /**
      * Show attendance reports index page listing active courses.
      */
     public function reportIndex()
