@@ -25,8 +25,10 @@
                       <tbody class="bg-white divide-y divide-gray-200">
                           @foreach($sessions as $session)
                               <tr>
-                                  <td class="px-6 py-4 whitespace-nowrap">
-                                      {{ $session->session_date->format('M d, Y') }}
+                              <td class="px-6 py-4 whitespace-nowrap">
+                                      <a href="{{ route('attendance.sessions.show', [$course->id, $session->id]) }}" class="text-blue-500 hover:text-blue-700">
+                                          {{ $session->session_date->format('M d, Y') }}
+                                      </a>
                                   </td>
                                   <td class="px-6 py-4 whitespace-nowrap">
                                       {{ $session->magic_word }}

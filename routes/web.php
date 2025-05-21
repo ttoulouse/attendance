@@ -93,8 +93,12 @@ Route::get('/attendance-sessions', [AttendanceController::class, 'sessionsIndex'
     ->name('attendance.sessions.index');
 Route::get('/attendance-sessions/{course}', [AttendanceController::class, 'sessionsForCourse'])
     ->name('attendance.sessions.course');
+Route::get('/attendance-sessions/{course}/{session}', [AttendanceController::class, 'showSession'])
+    ->name('attendance.sessions.show');
 Route::post('/attendance-sessions/{course}/{session}/archive', [AttendanceController::class, 'archiveSession'])
     ->name('attendance.sessions.archive');
+Route::post('/attendance-sessions/{course}/{session}/{student}/toggle', [AttendanceController::class, 'toggleAttendance'])
+    ->name('attendance.sessions.toggle');
 
 
 Route::get('/course/{course}/students', [StudentController::class, 'showForCourse'])

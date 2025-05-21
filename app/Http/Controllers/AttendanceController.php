@@ -223,6 +223,48 @@ public function alertsIndex()
     }
 
     /**
+     * Show all students for a specific attendance session with check-in status.
+     */
+    public function showSession(Course $course, AttendanceSession $session)
+    {
+        $students = $course->classStudents()->orderBy('last_name')->get();
+
+        $records = AttendanceRecord::where('attendance_session_id', $session->id)
+            ->get()
+            ->keyBy('class_student_id');
+
+        return view('attendance.session_details', compact('course', 'session', 'students', 'records'));
+    }
+
+    /**
+     * Toggle attendance for a student for the given session.
+     */
+    public function toggleAttendance(Course $course, AttendanceSession $session, ClassStudent $student)
+    {
+        if ($student->class_id !== $course->id) {
+            abort(404);
+        }
+
+        $record = AttendanceRecord::where('attendance_session_id', $session->id)
+            ->where('class_student_id', $student->id)
+            ->first();
+
+        if ($record) {
+            $record->delete();
+            $message = 'Student checked out.';
+        } else {
+            AttendanceRecord::create([
+                'attendance_session_id' => $session->id,
+                'class_student_id' => $student->id,
+                'check_in_time' => now(),
+            ]);
+            $message = 'Student checked in.';
+        }
+
+        return redirect()->back()->with('status', $message);
+    }
+
+    /**
      * Soft delete an attendance session.
      */
     public function archiveSession(Course $course, AttendanceSession $session)
