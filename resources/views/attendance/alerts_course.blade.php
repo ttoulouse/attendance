@@ -15,6 +15,7 @@
                               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student</th>
                               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Attended</th>
                               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Missed</th>
+                              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
                           </tr>
                       </thead>
                       <tbody class="bg-white divide-y divide-gray-200">
@@ -28,6 +29,12 @@
                                   </td>
                                   <td class="px-6 py-4 whitespace-nowrap">
                                       {{ $alert['missed'] }}
+                                  </td>
+                                  <td class="px-6 py-4 whitespace-nowrap">
+                                      <form method="POST" action="{{ route('attendance.alerts.archive', [$course->id, $alert['student']->id]) }}">
+                                          @csrf
+                                          <button type="submit" class="text-blue-600 hover:underline">Archive</button>
+                                      </form>
                                   </td>
                               </tr>
                           @endforeach

@@ -6,6 +6,7 @@ use App\Models\Course;
 use App\Models\AttendanceSession;
 use App\Models\AttendanceRecord;
 use App\Models\ClassStudent;
+use App\Models\ArchivedAttendanceAlert;
 use Illuminate\Http\Request;
 
 class AttendanceController extends Controller
@@ -121,15 +122,21 @@ public function alertsIndex()
 }
 
     public function alertsForCourse(\App\Models\Course $course)
-{
-    // Total sessions scheduled for this course
-    $totalSessions = $course->attendanceSessions()->count();
+    {
+        // Total sessions scheduled for this course
+        $totalSessions = $course->attendanceSessions()->count();
 
     // Collection to hold alert data
     $alerts = collect();
 
-    // Get all students enrolled in this course.
-    foreach ($course->classStudents as $student) {
+        // Get all students enrolled in this course.
+        foreach ($course->classStudents as $student) {
+            // Skip if this alert has been archived
+            if (ArchivedAttendanceAlert::where('course_id', $course->id)
+                ->where('class_student_id', $student->id)
+                ->exists()) {
+                continue;
+            }
         // Count the sessions this student attended
         $attended = $student->attendanceRecords()
             ->whereHas('attendanceSession', function($query) use ($course) {
@@ -174,6 +181,22 @@ public function alertsIndex()
 
     return view('attendance.alerts_course', compact('course', 'alerts'));
 }
+
+    /**
+     * Archive an attendance alert so it no longer appears.
+     */
+    public function archiveAlert(Course $course, ClassStudent $student)
+    {
+        ArchivedAttendanceAlert::updateOrCreate(
+            [
+                'course_id' => $course->id,
+                'class_student_id' => $student->id,
+            ],
+            ['archived_at' => now()]
+        );
+
+        return redirect()->back()->with('status', 'Alert archived');
+    }
 
     /**
      * Show attendance reports index page listing active courses.
